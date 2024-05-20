@@ -47,7 +47,9 @@
                        :style="{width: '15rem'}"/>
               <div class="edit-end">
                 <a-button type="primary" @click="saveEmail">保存</a-button>
-                <a-button type="default" @click="editEmail = false; replaceEmail = user.email; vCode = ''">取消
+                <a-button type="default"
+                          @click="editEmail = false; replaceEmail = user.email; vCode = '';emailStatus = true; vCodeStatus = true">
+                  取消
                 </a-button>
               </div>
             </div>
@@ -58,7 +60,8 @@
               <a-button type="default"
                         style="margin-left: 1rem; width: 6rem"
                         :disabled="sendCodeTimeWait > 0"
-                        @click="sendVerificationCode" >{{ codeButtonText }}</a-button>
+                        @click="sendVerificationCode">{{ codeButtonText }}
+              </a-button>
             </div>
           </div>
           <div class="edit-line" v-else>
@@ -69,8 +72,8 @@
         <a-descriptions-item label="密码">
           <div class="edit-line" v-if="editPassword">
             <a-input-password v-model:value="replacePassword"
-                     :status="passwordStatus ? '' : 'error'"
-                     :style="{width: '15rem'}"/>
+                              :status="passwordStatus ? '' : 'error'"
+                              :style="{width: '15rem'}"/>
             <div class="edit-end">
               <a-button type="primary" @click="savePassword">保存</a-button>
               <a-button type="default" @click="editPassword = false; replacePassword = ''">取消</a-button>
@@ -243,6 +246,7 @@ function setCodeTimeWait() {
     }
   }, 1000)
 }
+
 function sendVerificationCode() {
   const reg = /^[\w\-\\.]+@([\w-]+\.)+[\w-]{2,}$/
   emailStatus.value = reg.test(replaceEmail.value)
@@ -261,7 +265,7 @@ function sendVerificationCode() {
   }).then(res => {
     if (res.code === 0) {
       key = res.data.key
-    }else if (res.code === 3002) {
+    } else if (res.code === 3002) {
       message.warning('邮箱已存在')
       sendCodeTimeWait.value = 0
     } else {
@@ -271,13 +275,14 @@ function sendVerificationCode() {
 }
 
 const vCodeStatus = ref(true)
+
 function saveEmail() {
   const regEmail = /^[\w\-\\.]+@([\w-]+\.)+[\w-]{2,}$/
   const regCode = /^[0-9]{6}$/
   emailStatus.value = regEmail.test(replaceEmail.value)
   vCodeStatus.value = regCode.test(vCode.value)
   if (!emailStatus.value || !vCodeStatus.value) {
-    console.log(replaceEmail.value ,vCodeStatus.value)
+    console.log(replaceEmail.value, vCodeStatus.value)
     return
   }
   arRequest('/api/identity/user/current/email', {

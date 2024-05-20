@@ -6,18 +6,21 @@
           :style="{width:'100%'}">
     <a-form-item label="用户名">
       <a-input v-model:value="form.username"
+               placeholder="4-50位字母、数字或下划线"
                :maxlength="50"
                :status="usernameStatus ? '' : 'error'"
                @change="checkUsername"/>
     </a-form-item>
     <a-form-item label="密码">
       <a-input-password v-model:value="form.password"
+                        placeholder="4-50位字母、数字或下划线"
                         :maxlength="50"
                         :status="passwordStatus ? '' : 'error'"
                         @change="checkPassword"/>
     </a-form-item>
     <a-form-item label="确认密码">
       <a-input-password v-model:value="form.repassword"
+                        placeholder="再次输入密码"
                         :maxlength="50"
                         :status="repasswordStatus ? '' : 'error'"
                         @change="repasswordChanged = true; checkRepassword();"/>
@@ -38,6 +41,7 @@
     </a-form-item>
     <a-form-item label="昵称">
       <a-input v-model:value="form.displayName"
+               placeholder="选填"
                :maxlength="50"
                :status="displayNameStatus ? '' : 'error'"
                @change="checkDisplayName"/>

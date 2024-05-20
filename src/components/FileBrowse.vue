@@ -112,7 +112,7 @@
         </template>
       </a-table>
       <a-modal v-model:open="renameModalState" title="重命名" :width="300">
-        <a-input v-model:value="itemNewName" placeholder="目录名称" :maxlength="255"/>
+        <a-input v-model:value="itemNewName" placeholder="新名称" :maxlength="255"/>
         <template #footer>
           <a-button @click="renameItem" type="primary">重命名</a-button>
         </template>
@@ -330,7 +330,19 @@ const createDirectoryName = ref('')
 
 function createDirectory() {
   if (createDirectoryName.value.length === 0) {
+    message.warning('目录名称不能为空')
     return
+  }
+  if (createDirectoryName.value.length > 255) {
+    message.warning('目录名称不能超过255个字符')
+    return;
+  }
+  const invalidChars = ['/', '\\', ':', '*', '?', '"', '<', '>', '|']
+  for (const invalidChar of invalidChars) {
+    if (createDirectoryName.value.includes(invalidChar)) {
+      message.warning('目录名称包含非法字符')
+      return
+    }
   }
   const parentId = currentDirectoryId()
   arRequest('/api/file/items', {
@@ -433,7 +445,7 @@ async function physicalUpload(file) {
     }
     progressBarPercent.value = parseFloat(((i / chunkCount) * 100).toFixed(2))
   }
-  await uploadConfirm(file)
+  await uploadConfirm()
 }
 
 async function uploadChunk(file, chunkSerial) {
@@ -454,12 +466,12 @@ async function uploadChunk(file, chunkSerial) {
   return uploadHash === chunkHash
 }
 
-async function uploadConfirm(file) {
+async function uploadConfirm() {
   return arRequest(`/api/file/upload/physical/confirm/${uploadKey}`, {
     method: 'POST',
   }).then(async res => {
     if (res.code === 3005) {
-      await physicalUpload(file)
+      message.error('上传失败')
     }
   })
 }
@@ -670,7 +682,13 @@ function showImportShareModal() {
   importShareModalState.value = true
 }
 
+const shareCodeReg = /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/
+
 async function loadImportShareItem() {
+  if (!shareCodeReg.test(importShareCode.value)) {
+    message.warning('找不到可用的分享')
+    return
+  }
   arRequest(`/api/file/share/${importShareCode.value}?key=${importShareKey.value}`, {
     method: 'GET'
   }).then(res => {
@@ -685,10 +703,8 @@ async function loadImportShareItem() {
       }
       importShareModalWidth.value = 500
       importShareStep.value = 2
-    } else if (res.code === 1002) {
-      message.warning('找不到可用的分享')
     } else {
-      throw new Error()
+      message.warning('找不到可用的分享')
     }
   })
 }

@@ -16,15 +16,17 @@
     </a-form-item>
     <a-form-item label="密码">
       <a-input-password v-model:value="password"
-               :status="passwordStatus ? '' : 'error'"
-               :maxlength="50"
-               @change="checkPassword"/>
+                        placeholder="4-50位字母、数字或下划线"
+                        :status="passwordStatus ? '' : 'error'"
+                        :maxlength="50"
+                        @change="checkPassword"/>
     </a-form-item>
     <a-form-item label="确认密码">
       <a-input-password v-model:value="repassword"
-               :status="repasswordStatus ? '' : 'error'"
-               :maxlength="50"
-               @change="repasswordChanged = true; checkRepassword()"/>
+                        placeholder="再次输入密码"
+                        :status="repasswordStatus ? '' : 'error'"
+                        :maxlength="50"
+                        @change="repasswordChanged = true; checkRepassword()"/>
     </a-form-item>
     <a-form-item :wrapper-col="{ offset: 8}">
       <RouterLink style="margin-right: 1rem" to="/sign-in">
